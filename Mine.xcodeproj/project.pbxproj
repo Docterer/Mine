@@ -13,6 +13,9 @@
 		F14EF644206E0C290073FD37 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F14EF643206E0C290073FD37 /* Assets.xcassets */; };
 		F14EF647206E0C290073FD37 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F14EF645206E0C290073FD37 /* LaunchScreen.storyboard */; };
 		F14EF64A206E0C290073FD37 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F14EF649206E0C290073FD37 /* main.m */; };
+		F14EF658206E13A10073FD37 /* WORootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F14EF657206E13A10073FD37 /* WORootViewController.m */; };
+		F14EF695206E2EAE0073FD37 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F14EF694206E2EAE0073FD37 /* HomeViewController.m */; };
+		F14EF697206E3B230073FD37 /* webapp in Resources */ = {isa = PBXBuildFile; fileRef = F14EF696206E3B230073FD37 /* webapp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +29,11 @@
 		F14EF646206E0C290073FD37 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F14EF648206E0C290073FD37 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F14EF649206E0C290073FD37 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F14EF656206E13A10073FD37 /* WORootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WORootViewController.h; sourceTree = "<group>"; };
+		F14EF657206E13A10073FD37 /* WORootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WORootViewController.m; sourceTree = "<group>"; };
+		F14EF693206E2EAE0073FD37 /* HomeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
+		F14EF694206E2EAE0073FD37 /* HomeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
+		F14EF696206E3B230073FD37 /* webapp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = webapp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,8 +66,13 @@
 		F14EF639206E0C290073FD37 /* Mine */ = {
 			isa = PBXGroup;
 			children = (
+				F14EF692206E2E8F0073FD37 /* Home */,
+				F14EF659206E2C1F0073FD37 /* LocalHtml */,
+				F14EF653206E10FB0073FD37 /* Common */,
 				F14EF63A206E0C290073FD37 /* AppDelegate.h */,
 				F14EF63B206E0C290073FD37 /* AppDelegate.m */,
+				F14EF652206E10E60073FD37 /* SRC */,
+				F14EF651206E10D60073FD37 /* Global */,
 				F14EF63D206E0C290073FD37 /* ViewController.h */,
 				F14EF63E206E0C290073FD37 /* ViewController.m */,
 				F14EF640206E0C290073FD37 /* Main.storyboard */,
@@ -69,6 +82,62 @@
 				F14EF649206E0C290073FD37 /* main.m */,
 			);
 			path = Mine;
+			sourceTree = "<group>";
+		};
+		F14EF651206E10D60073FD37 /* Global */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Global;
+			sourceTree = "<group>";
+		};
+		F14EF652206E10E60073FD37 /* SRC */ = {
+			isa = PBXGroup;
+			children = (
+				F14EF654206E12D80073FD37 /* Root */,
+			);
+			path = SRC;
+			sourceTree = "<group>";
+		};
+		F14EF653206E10FB0073FD37 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		F14EF654206E12D80073FD37 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				F14EF655206E134E0073FD37 /* Controllers */,
+			);
+			path = Root;
+			sourceTree = "<group>";
+		};
+		F14EF655206E134E0073FD37 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				F14EF656206E13A10073FD37 /* WORootViewController.h */,
+				F14EF657206E13A10073FD37 /* WORootViewController.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		F14EF659206E2C1F0073FD37 /* LocalHtml */ = {
+			isa = PBXGroup;
+			children = (
+				F14EF696206E3B230073FD37 /* webapp */,
+			);
+			path = LocalHtml;
+			sourceTree = "<group>";
+		};
+		F14EF692206E2E8F0073FD37 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				F14EF693206E2EAE0073FD37 /* HomeViewController.h */,
+				F14EF694206E2EAE0073FD37 /* HomeViewController.m */,
+			);
+			path = Home;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -130,6 +199,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F14EF647206E0C290073FD37 /* LaunchScreen.storyboard in Resources */,
+				F14EF697206E3B230073FD37 /* webapp in Resources */,
 				F14EF644206E0C290073FD37 /* Assets.xcassets in Resources */,
 				F14EF642206E0C290073FD37 /* Main.storyboard in Resources */,
 			);
@@ -144,6 +214,8 @@
 			files = (
 				F14EF63F206E0C290073FD37 /* ViewController.m in Sources */,
 				F14EF64A206E0C290073FD37 /* main.m in Sources */,
+				F14EF658206E13A10073FD37 /* WORootViewController.m in Sources */,
+				F14EF695206E2EAE0073FD37 /* HomeViewController.m in Sources */,
 				F14EF63C206E0C290073FD37 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -278,12 +350,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = PP5PW8MM63;
+				DEVELOPMENT_TEAM = 66429YD7GV;
 				INFOPLIST_FILE = Mine/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ustcinfo.mine.Mine;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ustcinfo.ump;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -292,12 +366,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = PP5PW8MM63;
+				DEVELOPMENT_TEAM = 66429YD7GV;
 				INFOPLIST_FILE = Mine/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ustcinfo.mine.Mine;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ustcinfo.ump;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

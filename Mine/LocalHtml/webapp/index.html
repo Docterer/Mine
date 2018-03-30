@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>聊天界面</title>
+
+
+    <!--[if le IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link href="css/global.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+
+
+<body class="chat-bg">
+
+<header class="header-title">智能导诊</header>
+<!--显示的内容-->
+<section class="chat-box">
+    <span class="chat-trip">此刻对方忙碌，请留言</span>
+    <div class="bubbleDiv clearfix">
+
+    </div>
+</section>
+
+
+<!--提示无法正常访问麦克风的时候-->
+<!--<section id="model">-->
+<!--<span>X</span>-->
+<!--<p>即将为您下载手机百度</p>-->
+<!--<p>让您不用打字，说话就能搜索</p>-->
+<!--<button>立即下载</button>-->
+<!--以后再说 >-->
+<!--</section>-->
+
+
+<section class="container">
+    <canvas class="visualizer" height="200px" width="200px"></canvas>
+</section>
+
+<footer class="chat-edit clearfix">
+    <span class="uploadImgVoice"></span>
+    <p class="chat-info" placeholder="想咨询他什么内容..." contenteditable="true"></p>
+    <button id="btn" class="chat-voice">按住&nbsp;&nbsp;说话</button>
+    <button class="send-btn fr">发送</button>
+</footer>
+
+
+<script src="js/jquery.min.js"></script>
+<script src="js/mediaDevices-getUserMedia-polyfill.js"></script>
+<script type="text/javascript">
+    var audioBox,
+        audioCtx = new (window.AudioContext || webkitAudioContext)(),
+        bodyHeight = $('body').height(),
+        cancelHeight = (bodyHeight + 50) * 0.8;
+</script>
+<script src="js/chat.js"></script>
+<script>
+    $(document).ready(function () {
+        var cur_number = 0, cur_id;
+        var data = {
+            "user": {
+                "phone_number": "XX",
+                "token": "XXXX"
+            },
+            "basic_info": {}
+        };
+        $.ajax({
+            type: "post",
+            url: "dialogueID",
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify(data),
+            async: false,
+            success: function (data) {
+                var res = data;
+                cur_id = res.cur_id;
+            }
+        });
+        var canvas = $('.visualizer')[0],
+            canvasCtx = canvas.getContext("2d"),
+            btn = document.querySelector('#btn');
+//        在canvas上绘上去的图片
+        var img = new Image();
+        img.src = './images/voice.png';
+
+        img.onload = function () {
+            canvasCtx.font = "16px 微软雅黑";
+            canvasCtx.fillStyle = "white";
+            canvasCtx.fillText("手指上滑 ， 取消发送", 30, 190, 200);
+        }
+        var cancel = true;// 控制是否发送语音的flag;
+
+//        可以访问麦克风之后的程序
+		navigator.getUserMedia = navigator.getUserMedia ||
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia;
+            
+        if (navigator.mediaDevices.getUserMedia) {
+            var constraints = {audio: true};
+            var onSuccess = function (stream) {
+                var mediaRecorder = new MediaRecorder(stream);
+                var chunks = [];
+                visualize(stream);//这个过程是一直都有的只是显示和不显示的问题；
+                btn.addEventListener("touchstart", function (e) {
+                    mediaRecorder.start();
+                    cancel = true;
+                    $(canvas).css('background-image','none');
+                    $('.chat-voice').css('backgroundColor', 'rgba(75,75,75,.2)').text('松开        结束');
+                    $('section.container').css('display', 'block');
+                    e.preventDefault();
+                });
+                btn.addEventListener("touchmove", function (e) {
+                    var touchY = e.changedTouches[0].clientY;
+                    if( touchY < cancelHeight ){
+                        cancel = false;
+                        $('.chat-voice').css('backgroundColor', 'rgba(75,75,75,.2)').text('松开手指  取消发送');
+                        $(canvas).css('background-image','url("../images/delete.png")')
+                    }else{
+                        cancel = true;
+                        $('.chat-voice').css('backgroundColor', 'rgba(75,75,75,.2)').text('松开        结束');
+                        $(canvas).css('background-image','none');
+                    }
+                    e.preventDefault();
+                });
+
+                btn.addEventListener("touchend", function (e) {
+                    mediaRecorder.stop();
+                    $('section.container').css('display', 'none');
+                    $('.chat-voice').css('backgroundColor', '').text('按住       说话');
+                });
+                mediaRecorder.ondataavailable = function(e) {
+                    var blob = e.data;
+                    chunks.push(blob);
+                }
+                mediaRecorder.onstop = function (e) {
+                    //录音停止后生成用户对应的可播放的按钮；
+                    console.log("data available after MediaRecorder.stop() called.")
+                    audioBox = $("<div class='audioBox'></div>");
+                    var audio = document.createElement('audio');
+                    var audioBtn = $("<canvas class='audioBtn'></canvas>");
+                    $(audioBox).append(audio);
+                    $(audioBox).append(audioBtn);
+                    var blob = new Blob(chunks, {'type': 'audio/ogg; codecs=opus'});
+                    var audioURL = window.URL.createObjectURL(blob);
+                    audio.src = audioURL;
+                    audioBtn.on('click', function () {
+                        audio.play();
+                        //画一个动画；??？所以放了一张图片 动画还是很难画的；
+                    });
+                    //最终是否发送语音消息
+                    if(cancel){
+                        ajax_post(blob);
+                    }else{
+                        console.log('没有发送语音消息哦');
+                    }
+                    chunks = [];
+                };
+                function ajax_post(mydata) {
+                    blobToDataURL(mydata, function (dataurl) {
+                        var json = {
+                            "classid": 2,
+                            "voiceData": dataurl.split(',')[1],
+                            "tel": "111"
+                        };
+                        $.ajax({
+                            type: "POST",
+                            url: "https://51icare.com:8000/DemoService/PostData/",
+                            contentType: "application/json;charset=utf-8",
+                            data: JSON.stringify(json),
+                            dataType: "json",
+                            success: function (data) {
+//                                  语音返回的内容
+                                chat("rightBubble audioBox", "images/head_portrait.jpg", data);
+                                leftReq(data, cur_number);
+                            },
+                            error: function (message) {
+                                console.log('提交数据失败');
+                            }
+                        });
+                    });
+                }
+            };
+            var onError = function (err) {
+                console.log('The following error occured: ' + err);
+            };
+            navigator.mediaDevices.getUserMedia(constraints).then(onSuccess).catch(onError);
+        } else {
+            //无法访问的时候，显示相应的提示框
+            alert('无法正常访问麦克风，请升级到最新得浏览器的版本');
+        }
+//        切换文字和语音输入时的显示
+        $('.chat-edit>span').on('click', function () {
+            var _this = this,
+                className = $(_this).attr('class').toString();
+            $(_this).toggleClass('uploadImgKey');
+            if (_this.className === 'uploadImgVoice') {
+                $('.chat-edit>button,.chat-edit>.chat-info').css('display', 'block');
+                $('.chat-edit>.chat-voice').css('display', 'none');
+            } else if (_this.className === 'uploadImgVoice uploadImgKey') {
+                $('.chat-edit>button,.chat-edit>.chat-info').css('display', 'none');
+                $('.chat-edit>.chat-voice').css('display', 'block');
+            }
+        });
+//        发送消息的按钮事件
+        $(".send-btn").click(function () {
+            chat("rightBubble", "images/head_portrait.jpg", rightReq);
+            leftReq(rightReq, cur_number);
+            $('.chat-info').html('');
+        });
+//        对话右边的内容渲染
+        function rightReq() {
+            var resault = $('.chat-info').html();
+            return resault;
+        }
+//        对话左侧的渲染
+        function leftReq(rightReq, cur_num) {
+            var rightRes;
+            if (typeof(rightReq) == 'function') {
+                rightRes = rightReq();
+            } else {
+                rightRes = rightReq;
+            }
+            if (rightRes === "") return;
+            if (typeof (rightRes) === "string") {
+                rightRes = rightRes.replace(/[<div>]/g, "");
+                rightRes = rightRes.replace(/[<\/div>]/g, "");
+                rightRes = rightRes.replace(/\ +/g, ""); //去掉空格
+                rightRes = rightRes.replace(/[&nbsp;]/g, "");    //去掉空格
+                rightRes = rightRes.replace(/[\r\n]/g, ""); //去掉回车换行
+                rightRes = rightRes.replace(/[\n]/g, ""); //去掉换行
+                rightRes = rightRes.replace(/[r]/g, ""); //去掉回车
+            }
+            cur_number += 2;
+            var myDate = new Date(),
+                cur_time = myDate.getFullYear() + "-" + judge(myDate.getMonth() + 1) + "-" + judge(myDate.getDate()) + " " + judge(myDate.getHours()) + ":" + judge(myDate.getMinutes()),
+                data = {
+                    "cur_id": cur_id,
+                    "cur_input": rightRes,
+                    "cur_number": cur_num,
+                    "cur_time": cur_time
+                };
+            $.ajax({
+                type: "post",
+                url: "dialogueEngine",
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(data),
+                async: false,
+                success: function (data) {
+                    var res = data;
+                    console.log(res);
+                    chat("leftBubble", "images/robot.png", res);
+                }
+            });
+        }
+//        给后台传送日期的格式函数
+        function judge(value) {
+            if (value >= 10) {
+                return value;
+            } else {
+                return "0" + value;
+            }
+        }
+//        canvas 图画
+        function visualize(stream) {
+            var source = audioCtx.createMediaStreamSource(stream);
+            var analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 1024;//缓存区的数量
+            source.connect(analyser);
+            var WIDTH = canvas.width;
+            var HEIGHT = canvas.height;
+            draw();
+//            动画规则函数
+            function draw() {
+                if(!cancel){
+                    canvasCtx.clearRect(0, 0, 160, 160);
+                    requestAnimationFrame(draw);
+                    return;
+                }
+                var dataArray = new Uint8Array(8);
+                canvasCtx.clearRect(0, 0, 160, 160);
+                canvasCtx.drawImage(img, 0, 0, 180, 180);//绘制播放的喇叭以及语音收录音的动画
+                analyser.getByteFrequencyData(dataArray);
+                var startX = 120,
+                    height = 10,
+                    padding = 8;
+                $(dataArray).each(function (i, el) {
+                    var value = el;
+                    var startY = (i + 1) * (height + padding),
+                        width = 40 - (i * 4);
+                    canvasCtx.fillStyle = "#FFF";
+                    switch (i) {
+                        case 0:
+                            if (value >= 100) {
+                                canvasCtx.fillRect(startX, startY, width, height);
+                            }
+                            break;
+                        case 1:
+                            if (value >= 95) {
+                                canvasCtx.fillRect(startX, startY, width, height);
+                            }
+                            break;
+                        case 2:
+                            if (value >= 90) {
+                                canvasCtx.fillRect(startX, startY, width, height);
+                            }
+                            break;
+                        case 3:
+                            if (value > 85) {
+                                canvasCtx.fillRect(startX, startY, width, height);
+                            }
+                            break;
+                        case 4:
+                            if (value > 70) {
+                                canvasCtx.fillRect(startX, startY, width, height);
+                            }
+                            break;
+                        case 5:
+                            if (value > 40) {
+                                canvasCtx.fillRect(startX, startY, width, height);
+                            }
+                            break;
+                        case 6:
+                            if (value >= 0) {
+                                canvasCtx.fillRect(startX, startY, width, height);
+                            }
+                            break;
+                        default:
+                            canvasCtx.fillRect(startX, startY, width, height);
+                            break;
+                    }
+                });
+//                cancel为判断是否取消发送的全局变量
+                requestAnimationFrame(draw);
+            }
+        }
+        function Audio2dataURL(path) {
+            plus.io.resolveLocalFileSystemURL(path, function (entry) {
+                entry.file(function (file) {
+                    var reader = new plus.io.FileReader();
+                    reader.onloadend = function (e) {
+                        console.log(e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }, function (e) {
+                    mui.toast("读写出现异常: " + e.message);
+                })
+            })
+        }
+        function binToBase64(bitString) {
+            var result = "";
+            var tail = bitString.length % 6;
+            var bitStringTemp1 = bitString.substr(0, bitString.length - tail);
+            var bitStringTemp2 = bitString.substr(bitString.length - tail, tail);
+            for (var i = 0; i < bitStringTemp1.length; i += 6) {
+                var index = parseInt(bitStringTemp1.substr(i, 6), 2);
+                result += code[index];
+            }
+            bitStringTemp2 += new Array(7 - tail).join("0");
+            if (tail) {
+                result += code[parseInt(bitStringTemp2, 2)];
+                result += new Array((6 - tail) / 2 + 1).join("=");
+            }
+            return result;
+        }
+        function base64ToBin(str) {
+            var bitString = "";
+            var tail = 0;
+            for (var i = 0; i < str.length; i++) {
+                if (str[i] != "=") {
+                    var decode = code.indexOf(str[i]).toString(2);
+                    bitString += (new Array(7 - decode.length)).join("0") + decode;
+                } else {
+                    tail++;
+                }
+            }
+            return bitString.substr(0, bitString.length - tail * 2);
+        }
+        function stringToBin(str) {
+            var result = "";
+            for (var i = 0; i < str.length; i++) {
+                var charCode = str.charCodeAt(i).toString(2);
+                result += (new Array(9 - charCode.length).join("0") + charCode);
+            }
+            return result;
+        }
+        function BinToStr(Bin) {
+            var result = "";
+            for (var i = 0; i < Bin.length; i += 8) {
+                result += String.fromCharCode(parseInt(Bin.substr(i, 8), 2));
+            }
+            return result;
+        }
+        function blobToDataURL(blob, callback) {
+            var a = new FileReader();
+            a.readAsDataURL(blob);
+            a.onload = function (e) {
+                callback(e.target.result);
+            }
+        }
+    })
+</script>
+
+
+</body>
+</html>
