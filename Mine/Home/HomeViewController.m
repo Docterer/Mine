@@ -7,10 +7,28 @@
 //
 
 #import "HomeViewController.h"
+//识别功能
+#import "BDSEventManager.h"
+#import "BDSASRDefines.h"
+#import "BDSASRParameters.h"
+
+//唤醒功能
+#import "BDSWakeupDefines.h"
+#import "BDSWakeupParameters.h"
+
+//#error "请在官网新建应用，配置包名，并在此填写应用的 api key, secret key, appid(即appcode)"
+const NSString* API_KEY = @"";
+const NSString* SECRET_KEY = @"";
+const NSString* APP_ID = @"";
 
 @interface HomeViewController ()
+
+@property (strong, nonatomic) BDSEventManager *asrEventManager;
+@property (strong, nonatomic) BDSEventManager *wakeupEventManager;
+
 @property WebViewJavascriptBridge* bridge;
 //@property(retain,nonatomic) UIActivityIndicatorView *activityIndicator;
+
 @end
 
 @implementation HomeViewController{
@@ -20,6 +38,35 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationController.navigationBar.hidden = YES;
+    self.asrEventManager = [BDSEventManager createEventManagerWithName:BDS_ASR_NAME];
+    //创建语音识别对象
+    self.wakeupEventManager = [BDSEventManager createEventManagerWithName:BDS_WAKEUP_NAME];
+    // 设置语音唤醒代理
+    [self.wakeupEventManager setDelegate:self];
+    // 参数配置：离线授权APPID
+    [self.wakeupEventManager setParameter:APP_ID forKey:BDS_WAKEUP_APP_CODE];
+    // 参数配置：唤醒语言模型文件路径, 默认文件名为 bds_easr_basic_model.dat
+    [self.wakeupEventManager setParameter:@"唤醒语言模型文件路径" forKey:BDS_WAKEUP_DAT_FILE_PATH];
+    // 发送指令：加载语音唤醒引擎
+    [self.wakeupEventManager sendCommand:BDS_WP_CMD_LOAD_ENGINE];
+    //设置唤醒词文件路径
+    // 默认的唤醒词文件为"bds_easr_wakeup_words.dat"，包含的唤醒词为"百度一下"
+    // 如需自定义唤醒词，请在 http://ai.baidu.com/tech/speech/wake 中评估并下载唤醒词文件，替换此参数
+    [self.asrEventManager setParameter:@"唤醒词文件路径" forKey:BDS_WAKEUP_WORDS_FILE_PATH];
+    // 发送指令：启动唤醒
+    [self.wakeupEventManager sendCommand:BDS_WP_CMD_START];
+    
+    //注册键盘弹出通知
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardWillShowNotification
+                                               object:nil];
+    
+    //注册键盘隐藏通知
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
     
     // 开启日志
     [WebViewJavascriptBridge enableLogging];
@@ -68,6 +115,129 @@
     [self loadUrl];
     // Do any additional setup after loading the view.
 }
+//开始唤醒
+- (void)startWakeup
+{
+    [self configWakeupClient];
+    [self.wakeupEventManager setParameter:nil forKey:BDS_WAKEUP_AUDIO_FILE_PATH];
+    [self.wakeupEventManager setParameter:nil forKey:BDS_WAKEUP_AUDIO_INPUT_STREAM];
+    [self.wakeupEventManager sendCommand:BDS_WP_CMD_LOAD_ENGINE];
+    [self.wakeupEventManager sendCommand:BDS_WP_CMD_START];
+}
+//结束唤醒
+- (void)stopWakeup
+{
+    [self.wakeupEventManager sendCommand:BDS_WP_CMD_STOP];
+    [self.wakeupEventManager sendCommand:BDS_WP_CMD_UNLOAD_ENGINE];
+}
+
+- (void)configWakeupClient {
+    
+    [self.wakeupEventManager setDelegate:self];
+    [self.wakeupEventManager setParameter:APP_ID forKey:BDS_WAKEUP_APP_CODE];
+    
+    [self configWakeupSettings];
+}
+
+- (void)configWakeupSettings {
+    NSString* dat = [[NSBundle mainBundle] pathForResource:@"bds_easr_basic_model" ofType:@"dat"];
+    
+    // 默认的唤醒词为"百度一下"，如需自定义唤醒词，请在 http://ai.baidu.com/tech/speech/wake 中评估并下载唤醒词，替换此参数
+    NSString* words = [[NSBundle mainBundle] pathForResource:@"bds_easr_wakeup_words" ofType:@"dat"];
+    [self.wakeupEventManager setParameter:dat forKey:BDS_WAKEUP_DAT_FILE_PATH];
+    [self.wakeupEventManager setParameter:words forKey:BDS_WAKEUP_WORDS_FILE_PATH];
+}
+
+- (void)configOfflineClient {
+    
+    // 离线仅可识别自定义语法规则下的词
+    NSString* gramm_filepath = [[NSBundle mainBundle] pathForResource:@"bds_easr_gramm" ofType:@"dat"];;
+    NSString* lm_filepath = [[NSBundle mainBundle] pathForResource:@"bds_easr_basic_model" ofType:@"dat"];;
+    NSString* wakeup_words_filepath = [[NSBundle mainBundle] pathForResource:@"bds_easr_wakeup_words" ofType:@"dat"];;
+    [self.asrEventManager setDelegate:self];
+    [self.asrEventManager setParameter:APP_ID forKey:BDS_ASR_OFFLINE_APP_CODE];
+    [self.asrEventManager setParameter:lm_filepath forKey:BDS_ASR_OFFLINE_ENGINE_DAT_FILE_PATH];
+    // 请在 (官网)[http://speech.baidu.com/asr] 参考模板定义语法，下载语法文件后，替换BDS_ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH参数
+    [self.asrEventManager setParameter:gramm_filepath forKey:BDS_ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH];
+    [self.asrEventManager setParameter:wakeup_words_filepath forKey:BDS_ASR_OFFLINE_ENGINE_WAKEUP_WORDS_FILE_PATH];
+    
+}
+
+- (void)configRecognizerViewController {
+//    BDRecognizerViewParamsObject *paramsObject = [[BDRecognizerViewParamsObject alloc] init];
+//    paramsObject.isShowTipAfterSilence = YES;
+//    paramsObject.isShowHelpButtonWhenSilence = NO;
+//    paramsObject.tipsTitle = @"您可以这样问";
+//    paramsObject.tipsList = [NSArray arrayWithObjects:@"我要吃饭", @"我要买电影票", @"我要订酒店", nil];
+//    paramsObject.waitTime2ShowTip = 0.5;
+//    paramsObject.isHidePleaseSpeakSection = YES;
+//    paramsObject.disableCarousel = YES;
+//    self.recognizerViewController = [[BDRecognizerViewController alloc] initRecognizerViewControllerWithOrigin:CGPointMake(9, 80)
+//                 theme:nil
+//      enableFullScreen:YES
+//          paramsObject:paramsObject
+//              delegate:self];
+}
+
+- (void)configFileHandler {
+    //self.fileHandler = [self createFileHandleWithName:@"recoder.pcm" isAppend:NO];
+}
+
+
+//键盘弹出后将视图向上移动
+-(void)keyboardWillShow:(NSNotification *)note
+
+{
+    
+    NSDictionary *info = [note userInfo];
+    
+    CGSize keyboardSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
+    
+    //目标视图UITextField
+    
+    CGRect frame = _webView.frame;
+    
+    int y = frame.origin.y + frame.size.height - (self.view.frame.size.height - keyboardSize.height);
+    
+    NSTimeInterval animationDuration = 0.30f;
+    
+    [UIView beginAnimations:@"ResizeView" context:nil];
+    
+    [UIView setAnimationDuration:animationDuration];
+    
+    if(y > 0)
+        
+    {
+        
+        self.view.frame = CGRectMake(0, -y, self.view.frame.size.width, self.view.frame.size.height);
+        
+    }
+    
+    [UIView commitAnimations];
+    
+}
+
+
+
+//键盘隐藏后将视图恢复到原始状态
+
+-(void)keyboardWillHide:(NSNotification *)note
+
+{
+    
+    NSTimeInterval animationDuration = 0.30f;
+    
+    [UIView beginAnimations:@"ResizeView" context:nil];
+    
+    [UIView setAnimationDuration:animationDuration];
+    
+    self.view.frame =CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+    
+    [UIView commitAnimations];
+    
+}
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
