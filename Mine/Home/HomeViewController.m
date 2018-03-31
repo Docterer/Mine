@@ -9,6 +9,7 @@
 #import "HomeViewController.h"
 
 @interface HomeViewController ()
+@property WebViewJavascriptBridge* bridge;
 //@property(retain,nonatomic) UIActivityIndicatorView *activityIndicator;
 @end
 
@@ -18,7 +19,50 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //第三步：添加
+    self.navigationController.navigationBar.hidden = YES;
+    
+    // 开启日志
+    [WebViewJavascriptBridge enableLogging];
+//    NSHTTPCookieStorage *cook = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+//    [cook setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyAlways];
+    
+    //将webview与webviewJavascriptBridge关联
+    _bridge = [WebViewJavascriptBridge bridgeForWebView:self.webView webViewDelegate:self handler:^(id data, WVJBResponseCallback responseCallback) {
+    }];
+    
+    
+    //注册OC方法提供给JS调用示范
+//    [_bridge registerHandler:@"getAccAndIp" handler:^(id data, WVJBResponseCallback responseCallback) {
+//
+//        NSDictionary *WAN_INFO = [NetWorkTool deviceWANInfo];
+//
+//        NSString *pubipaddr = WAN_INFO[@"ip"];
+//        NSString *intranetaddr = [NetWorkTool getIpAddresses];
+//        NSString *iplocation = [NSString stringWithFormat:@"%@%@ %@",WAN_INFO[@"region"],WAN_INFO[@"city"],WAN_INFO[@"country"]];
+//
+//        NSDictionary *param = @{@"pubipaddr":pubipaddr,@"intranetaddr":intranetaddr,@"iplocation":iplocation};
+//
+//        responseCallback(param);
+//    }];
+    
+    [_bridge registerHandler:@"tryTouchIOS" handler:^(id data, WVJBResponseCallback responseCallback) {
+        NSLog(@"js传过来的参数---->  %@",data);
+        responseCallback(@"谁在呼喊");
+    }];
+    
+    
+    //OC调用JS方法示例
+    [_bridge callHandler:@"isConn" data:@"是你吗，你给我一双翅膀" responseCallback:^(id responseData){
+        NSLog(@"🤡🤡🤡JS确定收到数据的回调:%@",responseData);
+    }];
+    
+    
+    
+    
+    
+    
+    //添加静态页面到本地
+    
     [self.view addSubview:self.webView];
     //[self.view addSubview:self.activityIndicator];
     [self loadUrl];
@@ -33,7 +77,7 @@
 - (void)loadUrl
 {
     //第二步：加载服务器url，实现代理方法。-----注意点拦截url解决webview加载本地连接不显示问题
-    htmlLogin = [[NSBundle mainBundle] pathForResource:@"index"ofType:@"html"inDirectory:@"webapp/"];
+    htmlLogin = [[NSBundle mainBundle] pathForResource:@"index"ofType:@"html"inDirectory:@"assets/"];
     NSLog(@"2222%@",htmlLogin);
     NSURL* htmlUrl = [NSURL fileURLWithPath:htmlLogin];
     NSURLRequest* request = [NSURLRequest requestWithURL:htmlUrl];

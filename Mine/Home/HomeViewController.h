@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "WebViewJavascriptBridge.h"
 
 @interface HomeViewController : UIViewController<UIWebViewDelegate>
 @property (nonatomic, strong) UIWebView* webView;
