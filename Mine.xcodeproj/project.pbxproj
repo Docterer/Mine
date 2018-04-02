@@ -31,7 +31,6 @@
 		F1FF7E36206F9455008478D1 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1FF7E35206F9455008478D1 /* CFNetwork.framework */; };
 		F1FF7E46206FD05D008478D1 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = F1FF7E44206FD05D008478D1 /* .gitignore */; };
 		F1FF7E47206FD05D008478D1 /* libBaiduSpeechSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1FF7E45206FD05D008478D1 /* libBaiduSpeechSDK.a */; };
-		F1FF7E4920707111008478D1 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = F1FF7E4820707111008478D1 /* assets */; };
 		F1FF7E6C2070BFE1008478D1 /* BDSClientResources in Resources */ = {isa = PBXBuildFile; fileRef = F1FF7E6B2070BFE1008478D1 /* BDSClientResources */; };
 		F1FF7E782070BFF7008478D1 /* bds_easr_basic_model.dat in Resources */ = {isa = PBXBuildFile; fileRef = F1FF7E6E2070BFF7008478D1 /* bds_easr_basic_model.dat */; };
 		F1FF7E792070BFF7008478D1 /* bds_easr_dnn_wakeup_model.dat in Resources */ = {isa = PBXBuildFile; fileRef = F1FF7E6F2070BFF7008478D1 /* bds_easr_dnn_wakeup_model.dat */; };
@@ -60,6 +59,7 @@
 		F1FF7F1B20720037008478D1 /* UIProgressView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = F1FF7F0920720037008478D1 /* UIProgressView+AFNetworking.m */; };
 		F1FF7F1C20720037008478D1 /* UIRefreshControl+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = F1FF7F0B20720037008478D1 /* UIRefreshControl+AFNetworking.m */; };
 		F1FF7F1D20720037008478D1 /* UIWebView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = F1FF7F0D20720037008478D1 /* UIWebView+AFNetworking.m */; };
+		F1FF7F1F20725554008478D1 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = F1FF7F1E20725554008478D1 /* assets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -95,7 +95,6 @@
 		F1FF7E41206FCCA2008478D1 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		F1FF7E44206FD05D008478D1 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		F1FF7E45206FD05D008478D1 /* libBaiduSpeechSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libBaiduSpeechSDK.a; sourceTree = "<group>"; };
-		F1FF7E4820707111008478D1 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../../assets; sourceTree = "<group>"; };
 		F1FF7E6B2070BFE1008478D1 /* BDSClientResources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BDSClientResources; sourceTree = "<group>"; };
 		F1FF7E6E2070BFF7008478D1 /* bds_easr_basic_model.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = bds_easr_basic_model.dat; sourceTree = "<group>"; };
 		F1FF7E6F2070BFF7008478D1 /* bds_easr_dnn_wakeup_model.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = bds_easr_dnn_wakeup_model.dat; sourceTree = "<group>"; };
@@ -162,6 +161,7 @@
 		F1FF7F0B20720037008478D1 /* UIRefreshControl+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIRefreshControl+AFNetworking.m"; sourceTree = "<group>"; };
 		F1FF7F0C20720037008478D1 /* UIWebView+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWebView+AFNetworking.h"; sourceTree = "<group>"; };
 		F1FF7F0D20720037008478D1 /* UIWebView+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWebView+AFNetworking.m"; sourceTree = "<group>"; };
+		F1FF7F1E20725554008478D1 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -274,7 +274,7 @@
 		F14EF659206E2C1F0073FD37 /* LocalHtml */ = {
 			isa = PBXGroup;
 			children = (
-				F1FF7E4820707111008478D1 /* assets */,
+				F1FF7F1E20725554008478D1 /* assets */,
 			);
 			path = LocalHtml;
 			sourceTree = "<group>";
@@ -529,7 +529,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F1FF7E7C2070BFF7008478D1 /* bds_easr_mfe_cmvn.dat in Resources */,
-				F1FF7E4920707111008478D1 /* assets in Resources */,
 				F14EF6AC206F23BA0073FD37 /* WebViewJavascriptBridge.js.txt in Resources */,
 				F1FF7E7A2070BFF7008478D1 /* bds_easr_gramm.dat in Resources */,
 				F1FF7E7B2070BFF7008478D1 /* bds_easr_input_model.dat in Resources */,
@@ -540,6 +539,7 @@
 				F14EF644206E0C290073FD37 /* Assets.xcassets in Resources */,
 				F14EF642206E0C290073FD37 /* Main.storyboard in Resources */,
 				F1FF7EB32071FF3E008478D1 /* .gitIgnore in Resources */,
+				F1FF7F1F20725554008478D1 /* assets in Resources */,
 				F1FF7E7E2070BFF7008478D1 /* bds_easr_wakeup_words.dat in Resources */,
 				F1FF7F1420720037008478D1 /* README.md in Resources */,
 				F1FF7E812070BFF7008478D1 /* WakeUp.bin in Resources */,

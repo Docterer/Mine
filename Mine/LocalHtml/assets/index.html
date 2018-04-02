@@ -1,0 +1,44 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>江苏联通小优</title>
+<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="stylesheet" type="text/css" href="fonts/iconfont.css"/>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="ui-wrap">
+	<img src="images/bg.png" class="ui-bg">
+	<div class="ui-main">
+		<h1 class="ui-title">江苏联通小优</h1>
+		<div class="ui-robit">
+			<img src="images/robit.png" width="100%">
+		</div>
+		<div class="ui-voice" id="huanxing">
+			<span class="ui-voice-name"><img src="images/voice.png" class="ui-voice-icon">语音唤醒</span>
+		</div>
+	</div>
+</div>
+<script>
+	document.getElementById("huanxing").onclick = function(){
+        window.location.href = "chart.html";
+        //tryTouchIOS();
+	}
+	function tryTouchIOS(){
+		var data = "IOS你能听到吗?"
+		window.WebViewJavascriptBridge.callHandler(
+                    'tryTouchIOS'         //检测是否为WiFi连接
+                    ,data
+                    , function(responseData) {
+                    		alert("IOS返回的东西:"+responseData);
+                    }
+                );
+	}
+</script>
+<script type="text/javascript" src="js/jquery-1.10.2.min.js" ></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+</body>
+</html>
