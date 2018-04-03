@@ -23,28 +23,43 @@
           z-index: 1000;
 	}
 	.swipe-micrphone{
-		width: 80px;
-		height: 100;
+		width: 60px;
+		height: 100px;
+		/*text-align: center;*/
+		margin: 18px 20px 18px 30px;
+		display: block;
+		float: left;
+	}
+	.swipe-cancel{
+		width: 100px;
+		height: 100px;
 		text-align: center;
-		margin: 8 auto;
+		margin: 14px 30px;
 		display: block;
 	}
 	.swipe-text{
-		font-size: 15px;
+		font-size: 16px;
 		color: white;
 		text-align: center;
 		margin: 20px 9px 10px 9px;
+		clear: both;
 	}
 	.hide{
 		display: none;
 	}
 	.swipe-text-background{
-		font-size: 15px;
+		font-size: 16px;
 		color: white;
 		text-align: center;
-		margin: 20px 9px 10px 9px;
-		padding: 6px 0px;
+		margin: 18px 9px 0px 9px;
+		padding: 6px 0px 6px 0px;
 		background-color: #BB0000;
+	}
+	.volume-image{
+		width:40px;
+		height:100px;
+		margin: 18px 0px;
+		display: block;
 	}
 </style>
 </head>
@@ -52,7 +67,7 @@
 <div class="ui-wrap">
 	<img src="images/chart-bg.png" class="ui-chart-bg">
 	<img src="images/sm-robit.png" class="ui-robit-sm" id="robit-img">
-	<img src="images/bwt.gif" class="ui-bwt" id="shengbo-img" style="display:none;">
+	<img src="images/bwt.png" class="ui-bwt" id="shengbo-img">
 	<div class="ui-main">
 		<h1 class="ui-title">江苏联通小U</h1>
 	</div>
@@ -75,7 +90,7 @@
 	<div class="chart-main" id="voice-panel" >
 		<img src="images/keyboard.png" class="ui-icon f-l mr15" id="keyboard-btn">
 		<div class="f-l voice-btn" id="recordVoice">按住 说话</div>
-		<img src="images/add.png" class="ui-icon f-r">
+		<img id="testAdd" src="images/add.png" class="ui-icon f-r">
 		<img src="images/face.png" class="ui-icon f-r mr15">
 	</div>
 </div>
@@ -89,19 +104,18 @@
 	</div>
 </div>
 <-->
-<div id="hold" class="swipe-div hide" >
+<div id="hold" class="swipe-div hide">
 	<img src="images/microphone.png" class="swipe-micrphone"/>
+	<img id="volume-img" src="images/volume1.png" class="volume-image"/>
 	<p class="swipe-text">手指上滑 取消发送</p>
 </div>
 <div id="cancel" class="swipe-div hide" >
-	<img src="images/cancel.png" class="swipe-micrphone"/>
-	<p class="swipe-text-background">松开手指，取消发送</p>
+	<img src="images/cancel.png" class="swipe-cancel"/>
+	<p class="swipe-text-background">松开手指 取消发送</p>
 </div>
 
-<script type="text/javascript" src="js/jquery-1.10.2.min.js" ></script>
+<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
 <script type="text/javascript" src="js/mui.min.js"></script>
-<script type="text/javascript" src="js/common.js"></script>
-<!--<script type="text/javascript" src="js/bridge.js" ></script>-->
 <script type="text/javascript" src="js/chat.js"></script>
 </body>
 </html>

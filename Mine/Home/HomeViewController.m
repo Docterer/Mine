@@ -58,6 +58,7 @@ const NSString* APP_ID = @"11026313";
     [self configVoiceRecognitionClient];
     //创建语音唤醒对象
     self.wakeupEventManager = [BDSEventManager createEventManagerWithName:BDS_WAKEUP_NAME];
+    //开启唤醒
     [self startWakeup];
     
     //注册键盘弹出通知
@@ -326,7 +327,7 @@ const NSString* APP_ID = @"11026313";
             NSLog(@"EVoiceRecognitionClientWorkStatusMeterLevel:当前音量回调");
             NSLog(@"%@",aObj);
             [_bridge callHandler:@"updateVolume" data:aObj responseCallback:^(id responseData){
-                NSLog(@"🤡🤡🤡JS确定收到数据的回调:%@",responseData);
+                NSLog(@"🤡🤡🤡音量的回调:%@",responseData);
             }];
             break;
         }
