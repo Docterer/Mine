@@ -1,0 +1,130 @@
+@charset "UTF-8";
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, button, textarea, p, blockquote, th, td, i {
+  padding: 0;
+  margin: 0;
+  font-family: "Microsoft YaHei" , "微软雅黑" , sans-serif, -apple-system , BlinkMacSystemFont , "Segoe UI" , Roboto , "Segoe UI" , "Helvetica Neue", "PingFang SC", "Noto Sans" , "Noto Sans CJK SC" , "iconfont" !important;
+  list-style-type: none;
+  -webkit-font-smoothing: antialiased;
+  /* 抗锯齿渲染 */
+  -moz-osx-font-smoothing: grayscale;
+  /* 图标字体更清晰 */
+}
+body, button, input, select, textarea {
+  font: 12px/1.5;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: inherit;
+  font: 100%;
+}
+caption, th {
+  text-align: left;
+}
+fieldset, img {
+  border: none;
+}
+ul, ol {
+  list-style: none;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%;
+  font-weight: normal;
+}
+input, button, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  *font-size: 100%;
+  outline: none;
+}
+address, caption, cite, code, dfn, em, i, b, strong, th, var, optgroup {
+  font-style: normal;
+  font-weight: normal;
+}
+a {
+  text-decoration: none;
+  outline: none;
+}
+a:hover {
+  text-decoration: none;
+}
+.f-l {
+  float: left;
+}
+.f-r {
+  float: right;
+}
+.clearfix:after {
+	content: '\0020';
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+.clearfix {
+	zoom: 1;
+}
+
+.ui-bg{
+	position:absolute;
+	left:0;
+	top:0;
+	right:0;
+	bottom:0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+}
+.ui-main{
+	position:absolute;
+	left:0;
+	top:0;
+	right:0;
+	bottom:0;
+	width: 100%;
+	height: 100%;
+	z-index: 5;
+}
+.ui-title{
+	width: 100%;
+	color: #fff;
+	height: 48px;
+	line-height: 46px;
+	text-align: center;
+	font-size: 18px;
+	font-weight: bold;
+	background: url(../images/txt-bg2.png) no-repeat left top;
+	background-size: 100%;
+}
+.ui-robit{
+	position:absolute;
+	left:0;
+	top:0;
+	right:0;
+	bottom:0;
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+}
+.ui-voice{
+	width: 100%;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	z-index: 20;
+	background: url(../images/txt-bg1.png) no-repeat center center;
+	background-size: 100%;
+	height: 55px;
+	line-height: 55px;
+	text-align: center;
+}
+.ui-voice-name{
+	color: #fff;
+	text-align: center;
+}
+.ui-voice-icon{
+	width: 12px;
+	margin-right: 10px;
+	margin-top: 5px;
+}

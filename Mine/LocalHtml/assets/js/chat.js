@@ -58,6 +58,16 @@ function initEvent() {
         say();
         study();
         console.log("正在长按" );
+        //调用原生停止机器人讲话方法
+//      window.WebViewJavascriptBridge.callHandler(
+//                  'stopRobotSpeeking'
+//                  , {'param': data }
+//                  , function(responseData) {
+//                          var toastData = responseData;
+//                          console.error("机器人停止讲话調用成功"+responseData);
+//                  }
+//       );
+         //调用原生开始录音方法
          window.WebViewJavascriptBridge.callHandler(
             'startRecord'
             , {'param': '正在长按'}
@@ -108,7 +118,8 @@ function initEvent() {
             console.log("取消发送");
             stopSay();
             sleep();
-             window.WebViewJavascriptBridge.callHandler(
+            //调用原生取消录音
+         	window.WebViewJavascriptBridge.callHandler(
                  'cancelRecord'
                          , {'param': data }
                          , function(responseData) {
@@ -120,53 +131,6 @@ function initEvent() {
     });
 };
 initEvent();
-
-
-
-/*document.getElementById("recordVoice").addEventListener("longtap",function(){
-    this.style.backgroundColor = "red";
-    this.style.color = "white";
-    this.innerText = '松开 完成';
-    say();
-    console.log("正在长按" );
-     window.WebViewJavascriptBridge.callHandler(
-        'startRecord'
-        , {'param': data }
-        , function(responseData) {
-                //调用原生默认的处理Handle——弹框
-                var toastData = responseData;
-                console.error("調用成功"+responseData);
-        }
-     );
-});
-
-document.getElementById("recordVoice").addEventListener("dragstart",function(){
-    console.log("向上滑动");
-    window.WebViewJavascriptBridge.callHandler(
-         'cancelRecord'
-                 , {'param': data }
-                 , function(responseData) {
-                      var toastData = responseData;
-                       console.error("調用成功"+responseData);
-                 }
-              );
-});
-
-document.getElementById("recordVoice").addEventListener("release",function(){
-    console.log("取消长按");
-    this.innerText = '按住 说话';
-    this.style.backgroundColor = "";
-    this.style.color = "black";
-    stopSay();
-    window.WebViewJavascriptBridge.callHandler(
-            'stopRecord'
-            , {'param': data }
-            , function(responseData) {
-                 var toastData = responseData;
-                 console.error("調用成功"+responseData);
-            }
-    );
-});*/
 
 function connectWebViewJavascriptBridge(callback) {
             if (window.WebViewJavascriptBridge) {
@@ -191,11 +155,11 @@ function connectWebViewJavascriptBridge(callback) {
                 console.log('JS responding with', data);
                 responseCallback(data);
             });
-            // 注册一个"functionInJs",
+            //显示用户聊天消息
             bridge.registerHandler("showMyMsg", function(data, responseCallback) {
                 if(data != null && data != undefined){
-                		var arr = JSON.parse(data);
-                		data = arr.results_recognition[0];
+                		//var arr = JSON.parse(data);
+                		//data = arr.results_recognition[0];
                 		//alert("机器返回的识别结果:"+data);
                      addUserRequest(data);
                      responseCallback(data);
@@ -203,17 +167,48 @@ function connectWebViewJavascriptBridge(callback) {
                 }
 
             });
+            //显示机器人聊天消息
             bridge.registerHandler("showBobotMsg", function(data, responseCallback) {
                             if(data != null && data != undefined){
 //                                 addUserRequest(data);
+								//data = JSON.parse(data);
                                  addRobotResponse(data);
                             }else{
                                 addRobotResponse("你说啥？俺没听到!");
                             }
 
                         });
-        })
+            //开始机器人说话效果展示
+            bridge.registerHandler("robotSay", function(data, responseCallback) {
+                console.log("这是原生传的入参:"+data);
+                say();
+                smile();
+                responseCallback("js:机器人说话了");
+             });
 
+            //停止机器人说话效果展示
+            bridge.registerHandler("robotStop", function(data, responseCallback) {
+                 console.log("这是原生传的入参:"+data);
+                 sleep();
+                 stopSay();
+                 responseCallback("js:机器人停止说话");
+             });
+
+             //用户输入语音音量效果展示
+            bridge.registerHandler("updateVolume", function(data, responseCallback) {
+            		  //alert("这是原生传的音量入参:"+data);
+                  console.log("这是原生传的音量入参:"+data);
+                  var volumeLevel = 1;
+                  if(data != 0 && data != null && data != undefined){
+                      volumeLevel = Math.ceil(data/5);
+                  }
+                  if(volumeLevel > 7){
+                    volumeLevel = 7;
+                  }
+                  volume(volumeLevel);
+                  responseCallback("js:音量效果展示完毕，音量等级:"+volumeLevel);
+             });      
+        })
 
 function showKeyboardPanel() {
 	$('#keyboard-panel').show();
@@ -247,12 +242,18 @@ function goodbye() {
 }
 //聊天页面显示声波
 function say() {
-	$('#shengbo-img').show();
+	$('#shengbo-img').attr('src','images/bwt.gif');
 }
 //聊天页面隐藏声波
 function stopSay() {
-	$('#shengbo-img').hide();
+	$('#shengbo-img').attr('src','images/bwt.png');
 }
+
+//聊天页面 语音音量
+function volume(params) {
+	$('#volume-img').attr('src','images/volume'+params+'.png');
+}
+
 
 function addUserRequest(data) {
 	var request = '<li>'
