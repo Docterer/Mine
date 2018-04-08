@@ -23,6 +23,13 @@ $(document).ready(function(){
                      );
 		}
 	});
+	//监听键盘回车事件
+	$('#user-input-message').bind('keyup', function(event) {
+    　　if (event.keyCode == "13") {
+    　　　　//回车执行查询
+    　　　　$('#send-btn').click();
+    　　}
+    });
 });
 
 
@@ -59,14 +66,14 @@ function initEvent() {
         study();
         console.log("正在长按" );
         //调用原生停止机器人讲话方法
-//      window.WebViewJavascriptBridge.callHandler(
-//                  'stopRobotSpeeking'
-//                  , {'param': data }
-//                  , function(responseData) {
-//                          var toastData = responseData;
-//                          console.error("机器人停止讲话調用成功"+responseData);
-//                  }
-//       );
+        window.WebViewJavascriptBridge.callHandler(
+                    'stopRobotSpeeking'
+                    , {'param': data }
+                    , function(responseData) {
+                            var toastData = responseData;
+                            console.error("机器人停止讲话調用成功"+responseData);
+                    }
+         );
          //调用原生开始录音方法
          window.WebViewJavascriptBridge.callHandler(
             'startRecord'
@@ -158,9 +165,6 @@ function connectWebViewJavascriptBridge(callback) {
             //显示用户聊天消息
             bridge.registerHandler("showMyMsg", function(data, responseCallback) {
                 if(data != null && data != undefined){
-                		//var arr = JSON.parse(data);
-                		//data = arr.results_recognition[0];
-                		//alert("机器返回的识别结果:"+data);
                      addUserRequest(data);
                      responseCallback(data);
 //                     addRobotResponse("机器人说："+data);

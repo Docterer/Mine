@@ -717,7 +717,7 @@
 				DEVELOPMENT_TEAM = 66429YD7GV;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = Mine/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -740,7 +740,7 @@
 				DEVELOPMENT_TEAM = 66429YD7GV;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = Mine/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

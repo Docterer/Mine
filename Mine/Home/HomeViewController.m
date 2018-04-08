@@ -7,7 +7,7 @@
 //
 
 #import "HomeViewController.h"
-//#import "ChatViewController.h"
+#import<AVFoundation/AVSpeechSynthesis.h>
 //识别功能
 #import "BDSEventManager.h"
 #import "BDSASRDefines.h"
@@ -25,7 +25,7 @@ const NSString* API_KEY = @"PmrwnGrMkF5UtjlhxLBZ3BAF";
 const NSString* SECRET_KEY = @"68e5d0acfd1ef99858e2a3815f0e8eec";
 const NSString* APP_ID = @"11026313";
 
-@interface HomeViewController ()<BDSClientWakeupDelegate,BDSClientASRDelegate,BDRecognizerViewDelegate>
+@interface HomeViewController ()<BDSClientWakeupDelegate,BDSClientASRDelegate,BDRecognizerViewDelegate,AVSpeechSynthesizerDelegate>
 
 @property (strong, nonatomic) BDSEventManager *asrEventManager;
 @property (strong, nonatomic) BDSEventManager *wakeupEventManager;
@@ -48,6 +48,7 @@ const NSString* APP_ID = @"11026313";
 
 @implementation HomeViewController{
     NSString *htmlLogin;
+    AVSpeechSynthesizer *av;
 }
 
 - (void)viewDidLoad {
@@ -86,8 +87,8 @@ const NSString* APP_ID = @"11026313";
     [_bridge registerHandler:@"startRecord" handler:^(id data, WVJBResponseCallback responseCallback) {
         NSLog(@"js传过来的参数---->  %@",data);
         //按到发送语音按钮了
-        [self recognizeVoice];
-        //[self longSpeechRecognition];
+        //[self recognizeVoice];
+        [self longSpeechRecognition];
         responseCallback(@"谁在呼喊");
     }];
     
@@ -103,22 +104,61 @@ const NSString* APP_ID = @"11026313";
         [self.asrEventManager sendCommand:BDS_ASR_CMD_CANCEL];
         responseCallback(@"发送结束");
     }];
-    //图灵语音回话
-//    [_bridge registerHandler:@"sendToTuLin" handler:^(id data, WVJBResponseCallback responseCallback) {
-//        NSLog(@"我发送的消息---->  %@",data);
-//        [_bridge callHandler:@"showBobotMsg" data:data responseCallback:^(id responseData){
-//            NSLog(@"🤡🤡🤡JS确定收到数据的回调:%@",responseData);
-//        }];
-//        responseCallback(@"图灵图灵");
-//    }];
-
-    //添加静态页面到本地
     
+    //停止机器人讲话
+    [_bridge registerHandler:@"stopRobotSpeeking" handler:^(id data, WVJBResponseCallback responseCallback) {
+        NSLog(@"取消机器人讲话");
+        [av stopSpeakingAtBoundary:AVSpeechBoundaryWord];
+    }];
+    
+    //添加静态页面到本地
     [self.view addSubview:self.webView];
     //[self.view addSubview:self.activityIndicator];
     [self loadUrl];
     // Do any additional setup after loading the view.
 }
+
+//语音合成方法，把文字转成语音
+- (void)speekStart:(NSString*)speekWords
+{
+    NSLog(@"传来的语音:%@",speekWords);
+    av = [[AVSpeechSynthesizer alloc]init];//初始化对象
+    av.delegate=self;//挂上代理
+    AVSpeechUtterance*utterance = [[AVSpeechUtterance alloc]initWithString:speekWords];//需要转换的文字
+    utterance.rate=0.5;// 设置语速，范围0-1，注意0最慢，1最快；AVSpeechUtteranceMinimumSpeechRate最慢，AVSpeechUtteranceMaximumSpeechRate最快
+    AVSpeechSynthesisVoice*voice = [AVSpeechSynthesisVoice voiceWithLanguage:@"zh-CN"];//设置发音，这是中文普通话
+    utterance.voice= voice;
+    [av speakUtterance:utterance];//开始
+}
+
+- (void)speechSynthesizer:(AVSpeechSynthesizer*)synthesizer didStartSpeechUtterance:(AVSpeechUtterance*)utterance{
+    
+    NSLog(@"---开始播放");
+    
+}
+
+- (void)speechSynthesizer:(AVSpeechSynthesizer*)synthesizer didFinishSpeechUtterance:(AVSpeechUtterance*)utterance{
+    
+    NSLog(@"---完成播放");
+    
+}
+
+- (void)speechSynthesizer:(AVSpeechSynthesizer*)synthesizer didPauseSpeechUtterance:(AVSpeechUtterance*)utterance{
+    
+    NSLog(@"---播放中止");
+    
+}
+- (void)speechSynthesizer:(AVSpeechSynthesizer*)synthesizer didContinueSpeechUtterance:(AVSpeechUtterance*)utterance{
+    
+    NSLog(@"---恢复播放");
+    
+}
+- (void)speechSynthesizer:(AVSpeechSynthesizer*)synthesizer didCancelSpeechUtterance:(AVSpeechUtterance*)utterance{
+    
+    NSLog(@"---播放取消");
+    
+}
+
 //语音识别方法
 - (void)recognizeVoice
 {
@@ -246,13 +286,12 @@ const NSString* APP_ID = @"11026313";
             }
             //命中唤醒词之后便关闭唤醒
             [self stopWakeup];
+            [_bridge callHandler:@"wakeup"];//调用页面唤醒功能展示
             NSString *chats = [[NSBundle mainBundle] pathForResource:@"chat"ofType:@"html"inDirectory:@"assets/"];
             NSLog(@"1998%@",chats);
             NSURL* htmlUrl = [NSURL fileURLWithPath:chats];
             NSURLRequest* request = [NSURLRequest requestWithURL:htmlUrl];
             [self.webView loadRequest:request];
-//            ChatViewController *ctView = [[ChatViewController alloc]init];
-//            [self presentViewController:ctView animated:YES completion:nil];
             break;
         }
             
@@ -314,6 +353,8 @@ const NSString* APP_ID = @"11026313";
                 NSString *text2 = [self dicToString:aObj :@"results_recognition"];
                 [_bridge callHandler:@"showMyMsg" data:text2 responseCallback:^(id responseData){
                     NSLog(@"🤡🤡🤡JS确定收到数据的回调:%@",responseData);
+                    //[self speekStart:text2];
+                    [self sendInfoToRobot:text2];//发消息给机器人
                 }];
                 //TODO:展示用户语音识别消息后，需要将识别的语音消息发送给联通机器人
             }
@@ -627,7 +668,21 @@ const NSString* APP_ID = @"11026313";
     //[self.activityIndicator startAnimating] ;
 }
 - (void)webViewDidFinishLoad:(UIWebView *)webView{
-    //[self.activityIndicator stopAnimating];
+    //判断当前所在的页面，在聊天界面就启动机器人打招呼
+    NSString *currUrl = _webView.request.URL.absoluteString;
+    NSLog(@"当前在哪个页面%@",currUrl);
+    if ([currUrl containsString:@"chat.html"]) {
+        NSLog(@"currUrl包含chat.html");
+        //聊天页面一加载，就启动机器人说话
+        [_bridge callHandler:@"showBobotMsg" data:@"你好呀 我是小U" responseCallback:^(id responseData){
+            
+        }];
+        [self speekStart:@"你好呀 我是小优"];
+        [_bridge callHandler:@"robotSay"];//机器人说话效果展示
+        [_bridge callHandler:@"robotStop"];//机器人说话停止展示
+    } else {
+        NSLog(@"currUrl不存在chat.html");
+    }
     //禁用长按触控对象弹出的菜单
     [_webView stringByEvaluatingJavaScriptFromString:@"document.documentElement.style.webkitTouchCallout='none';"];
     //设置导航头
@@ -695,42 +750,79 @@ const NSString* APP_ID = @"11026313";
     NSLog(@"😇😇取得json字符串中的结果:%@",text2);
     return text2;
 }
-//post请求机器人的URL
-//- (NSString*)sendInfoToRobot:(NSString*)url :(NSString*)param
-//{
-//    // 1.设置请求路径
-//    NSURL *URL=[NSURL URLWithString:url];
-//    // 2.创建请求对象
-//    //NSURLRequest *request=[NSURLRequest requestWithURL:URL];
-//    NSMutableURLRequest *request=[NSMutableURLRequest requestWithURL:URL];
-//    request.timeoutInterval=5.0;//设置请求超时为5秒
-//    request.HTTPMethod=@"POST";//设置请求方法
-//    //设置请求体
-//    //param=[NSString stringWithFormat:@"userName=%@&password=%@",phone.text,base64Pwd];
-//    //把拼接后的字符串转换为data，设置请求体
-//    request.HTTPBody=[param dataUsingEncoding:NSUTF8StringEncoding];
-//    //连接
-//    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse * _Nullable response, NSData * _Nullable data, NSError * _Nullable connectionError) {
-//        NSLog(@"返回的data   %@",data);
-//        //将返回的结果data转为字典
-//        NSDictionary *dicJson=[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
-//        NSLog(@"字典   %@",dicJson[@"meta"][@"code"]);
-//        if([dicJson[@"meta"][@"code"]  isEqual: @"SC_200"] || [dicJson[@"meta"][@"code"]  isEqual: @"OK"]){
-//            NSUserDefaults *userDefaults=[NSUserDefaults standardUserDefaults];
-//            [userDefaults setObject:@"success" forKey:@"VerificationPhone"];
-//            [userDefaults setObject:[NSString stringWithFormat:@"%@",phone.text] forKey:@"account"];
-//            [userDefaults setObject:[NSString stringWithFormat:@"%@",dicJson[@"data"][@"id"]] forKey:@"id"];
-//            [userDefaults synchronize];
-//        }else if([dicJson[@"meta"][@"code"]  isEqual: @"SC_400"]){
-//            //登录失败弹出提示信息
-//            UIAlertView *alertView=[[UIAlertView alloc]initWithTitle:@"系统信息" message:@"用户名或密码错误，请重新输入！" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:nil];
-//            [alertView show];
-//            NSLog(@"请求后台成功但是账户名或者密码错误");
-//        }else {
-//
-//        }
-//    }];
-//    return @"11";
-//}
+/*
+ param:用户说的话，IMEI:手机唯一标识码
+ */
+//HTTP请求机器人的URL
+- (void)sendInfoToRobot:(NSString*)param
+{
+    NSString *authcode = @"QUhfV0ZfQVBQI0BhdXRoQCNVM08wRkl2dA";
+    NSString *businessCode = @"chat";
+    NSString *content = param;
+    NSString *machineCode = [self IMEI];
+    NSString *requestTime = @"";
+    NSString *sessionId = @"";
+    // 1.设置请求路径
+    NSURL *URL=[NSURL URLWithString:@"http://58.240.55.10:9080/esb/aiRobotQuestionAndAnswer/0?authcode=SlNfQUlhYmlsaXR5I0BhdXRoQCNjQW9OeE9vaw&msgid=test"];
+    // 2.创建请求对象
+    //NSURLRequest *request=[NSURLRequest requestWithURL:URL];
+    NSMutableURLRequest *request=[NSMutableURLRequest requestWithURL:URL];
+    request.timeoutInterval=5.0;//设置请求超时为5秒
+    request.HTTPMethod=@"POST";//设置请求方法
+    //设置请求头
+    [request addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    //设置请求体
+    NSDictionary *json = @{
+                           @"authcode":authcode,
+                           @"businessCode":businessCode,
+                           @"content":content,
+                           @"machineCode":machineCode,
+                           @"requestTime":requestTime,
+                           @"sessionId":sessionId
+                           };
+    NSData *data = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:nil];
+    //把拼接后的字符串转换为data，设置请求体
+    request.HTTPBody = data;
+    //连接
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse * _Nullable response, NSData * _Nullable data, NSError * _Nullable connectionError) {
+        NSString *receiveStr =[[ NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        //去除字符串中所有的换行和空格
+        receiveStr = [self removeSpaceAndNewline:receiveStr];
+        NSLog(@"data转字符串   %@",receiveStr);
+        //字符串转字典
+        NSData * data2= [receiveStr dataUsingEncoding:NSUTF8StringEncoding];
+        //data转字典
+        NSDictionary *dicJson=[NSJSONSerialization JSONObjectWithData:data2 options:NSJSONReadingMutableContainers error:nil];
+        NSString *strRes = [dicJson objectForKey:@"desc"];
+        NSString *robotSpeakWords = [dicJson objectForKey:@"content"];//机器人朗读
+        NSLog(@"🙄🙄解析的字典的值:%@",strRes);
+        if([strRes isEqual: @"成功"]){
+            //展示用户语音识别消息后，需要将识别的语音消息发送给联通机器人
+            [_bridge callHandler:@"showBobotMsg" data:robotSpeakWords responseCallback:^(id responseData){
+                //NSLog(@"🤡🤡🤡JS确定收到数据的回调:%@",responseData);
+            }];
+            [self speekStart:robotSpeakWords];
+            [_bridge callHandler:@"robotSay"];//机器人说话效果展示
+            [_bridge callHandler:@"robotStop"];//机器人说话停止展示
+        }else {
+            //失败
+            NSLog(@"小优有点卡顿");
+        }
+    }];
+}
+//获取手机唯一标识编码
+- (NSString *)IMEI{
+    NSString *identifierForVendor = [[UIDevice currentDevice].identifierForVendor UUIDString];
+    NSLog(@"identifierForVendor == %@",identifierForVendor);
+    return identifierForVendor;
+}
+//去除字符串中所有换行和空格
+- (NSString *)removeSpaceAndNewline:(NSString *)str
+{
+    NSString *temp = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+    temp = [temp stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+    temp = [temp stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    return temp;
+}
 
 @end

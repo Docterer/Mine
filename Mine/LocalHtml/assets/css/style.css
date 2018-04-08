@@ -137,14 +137,14 @@ a:hover {
 .ui-robit-sm{
 	position:absolute;
 	right: 20px;
-	top: 80px;
+	top: 60px;
 	/*width: 130px;*/
 	height: 170px;
 	z-index:102;
 }
 .ui-content{
 	position:absolute;
-	top: 30%;
+	top: 18%;
 	width: 100%;
 	z-index: 99;
 	bottom: 50px;
@@ -208,7 +208,7 @@ a:hover {
 	text-align: left;
 	word-break: break-all;
 	background: #f5222d;
-	border-radius: 2px;
+	border-radius: 10px;
 	color: #fff;
 	/* float:  left; */
 	margin-left: 0px;
@@ -245,7 +245,7 @@ a:hover {
 	text-align: left;
 	word-break: break-all;
 	background: #ececec;
-	border-radius: 2px;
+	border-radius: 10px;
 	float: right;
 	/* margin-right: 10px; */
 	color: #666;
@@ -328,7 +328,7 @@ a:hover {
 		min-width: 62%;
 	}
 	.voice-btn{
-		min-width: 62%;
+		min-width: 73%;
 	}
 	.send-btn {
     width: 16%;
@@ -339,7 +339,7 @@ a:hover {
 		min-width: 64%;
 	}
 	.voice-btn{
-		min-width: 63%;
+		min-width: 74%;
 	}
 	.send-btn {
     width: 17%;
@@ -350,7 +350,7 @@ a:hover {
 		min-width: 64%;
 	}
 	.voice-btn{
-		min-width: 64%;
+		min-width: 75%;
 	}
 	.send-btn {
     width: 18%;
@@ -361,7 +361,7 @@ a:hover {
 		min-width: 64%;
 	}
 	.voice-btn{
-		min-width: 64%;
+		min-width: 75%;
 	}
 	.send-btn {
     width: 18%;
@@ -372,7 +372,7 @@ a:hover {
 		min-width: 64%;
 	}
 	.voice-btn{
-		min-width: 64%;
+		min-width: 75%;
 	}
 	.send-btn {
     width: 19%;
@@ -413,7 +413,7 @@ a:hover {
 .ui-robit-sm{
 	z-index:102;
 }
-.ui-chart{
+/*.ui-chart{
     -webkit-user-select:none;
      -webkit-touch-callout:none;
- }
+ }*/

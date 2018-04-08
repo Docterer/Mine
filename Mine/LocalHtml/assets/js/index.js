@@ -21,10 +21,9 @@ connectWebViewJavascriptBridge(function(bridge) {
     console.log('JS responding with', data);
         responseCallback(data);
    });
-	//注册提供给OC网络状态实时监控的方法以调用
-// bridge.registerHandler("openPage", function(data, responseCallback) {
-// 		  //data是OC返回给JS的值，responseCallback是js收到值后通知OC的方法
-// 		  		window.location.href = "chart01.html";
-//             responseCallback(data);
-//     });
+	//js提供给原生调用的唤醒机器人效果
+    bridge.registerHandler("wakeup", function(data, responseCallback) {
+        $("#robit").attr("src","images/index-robit-wakeup.gif");
+        console.log("js起来起来:"+data);
+    });
    });
